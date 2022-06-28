@@ -73,7 +73,10 @@ function TodoList({list, dispatch}) {
             <div className={style.status + ' ' + (item.isActive ? style.backAqua : style.backGreen)}>
                 {(item.isActive ? 'active' : 'completed')}
             </div>
-            <div onClick={() => deleteTodo(item.id)}>delete</div>
+            <div onClick={() => deleteTodo(item.id)}
+                 className={style.deleteContainer}>
+                <div className={style.delete}></div>
+            </div>
         </div>
     }
 
@@ -97,6 +100,7 @@ function TodoList({list, dispatch}) {
     }, [])
 
     return (<div className={style.todoListContainer}>
+        <div className={style.topLine}></div>
         <div className={style.addTodo}>
             <input onKeyPress={(event) => saveTodo(event)}
                    onChange={e => setTextInput(e.target.value)}
@@ -111,12 +115,13 @@ function TodoList({list, dispatch}) {
             <div>
                 <span>{listLength}</span><span>item left</span>
             </div>
-            <div>
-                <button onClick={() => addFilter('active')}>active</button>
-                <button onClick={() => addFilter('all')}>All</button>
+            <div className={style.filters}>
+                <span className={filter === 'active' ? style.active : ''}
+                      onClick={() => addFilter('active')}>active</span>
+                <span className={filter === 'all' ? style.active : ''} onClick={() => addFilter('all')}>All</span>
             </div>
             <div>
-                <button onClick={deleteCompleted}>deleteCompleted</button>
+                <button onClick={deleteCompleted}>Clear completed</button>
             </div>
         </div>
     </div>)
