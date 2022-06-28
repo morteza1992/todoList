@@ -19,7 +19,10 @@ function TodoList({list, dispatch}) {
     const saveTodo = (event) => {
         if (event.key === "Enter") {
             dispatch({
-                type: "ADD_TODO", id: newTodoId, title: textInput
+                type: "ADD_TODO",
+                id: newTodoId,
+                title: textInput,
+                change: true
             })
             setTextInput('')
         }
@@ -27,19 +30,27 @@ function TodoList({list, dispatch}) {
 
     const completeTodo = (item) => {
         dispatch({
-            type: "TOGGLE_TODO", id: item.id, isActive: item.isActive
+            type: "TOGGLE_TODO",
+            id: item.id,
+            isActive: item.isActive,
+            change: true
         })
     }
 
     const changeTodoText = (event, id) => {
         dispatch({
-            type: "CHANGE_TEXT_TODO", id: id, title: event.target.value
+            type: "CHANGE_TEXT_TODO",
+            id: id,
+            title: event.target.value,
+            change: true
         })
     }
 
     const deleteTodo = (id) => {
         dispatch({
-            type: "DELETE_TODO", id: id
+            type: "DELETE_TODO",
+            id: id,
+            change: true
         })
     }
 
@@ -97,11 +108,11 @@ function TodoList({list, dispatch}) {
     }
 
     useEffect(() => {
-        if (list && list.length > 0) {
+        if (list) {
             lengthOfActiveTodo()
         }
         router.replace('?all')
-    }, [])
+    }, [list])
 
     return (<div className={style.todoListContainer}>
         <div className={style.topLine}></div>

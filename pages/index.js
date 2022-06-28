@@ -4,6 +4,7 @@ import todos from "../redux/reducers";
 import {createStore} from "redux";
 import {Provider} from "react-redux";
 import dynamic from "next/dynamic";
+
 const TodoList = dynamic(() => import("../components/todoList/todoList.js"), {
     ssr: false,
 });
@@ -15,13 +16,14 @@ const store = createStore(todos, initialState)
 const fillTodo = () => {
     let data = JSON.parse(localStorage.getItem('todoList'))
     store.dispatch({
-        type: "FILL_TODO", data: data.list
+        type: "FILL_TODO",
+        data: data ? data.list : []
     })
 }
+if (typeof window !== "undefined") {
+    fillTodo()
+}
 export default function Home() {
-    if (typeof window !== "undefined") {
-        fillTodo()
-    }
     return (
         <>
             <div className={styles.container}>

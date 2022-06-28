@@ -26,7 +26,7 @@ const todos = (state = state.list, action) => {
             storeState = state;
             break;
     }
-    if (typeof window !== 'undefined' && storeState.list && storeState.list.length > 0) {
+    if (typeof window !== 'undefined' && storeState.list && action.change) {
         localStorage.setItem('todoList', JSON.stringify(storeState))
     }
     return storeState
