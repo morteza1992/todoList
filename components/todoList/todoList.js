@@ -1,5 +1,5 @@
 import style from './style/todoList.module.scss'
-import {useState, useEffect, useRef} from 'react'
+import {useState, useEffect} from 'react'
 import {connect} from "react-redux";
 
 function mapStateToProps(store) {
@@ -12,19 +12,12 @@ function TodoList({list, dispatch}) {
     const [filter, setFilter] = useState('all');
     const [clickedId, setClickedId] = useState(null);
     const [textInput, setTextInput] = useState('');
-    const todoInput = useRef()
-    useEffect(() => {
-        if (todoInput.current) {
-            console.log(todoInput)
-            todoInput.current.focus()
-        }
-    }, [clickedId])
+    const [listLength, setListLength] = useState(0);
+    const newTodoId = list && list.length > 0 ? list.slice(-1)[0].id + 1 : 1
     const saveTodo = (event) => {
         if (event.key === "Enter") {
             dispatch({
-                type: "ADD_TODO",
-                id: list.length + 1,
-                title: textInput
+                type: "ADD_TODO", id: newTodoId, title: textInput
             })
             setTextInput('')
         }
@@ -32,17 +25,25 @@ function TodoList({list, dispatch}) {
 
     const completeTodo = (item) => {
         dispatch({
-            type: "TOGGLE_TODO",
-            id: item.id,
-            isActive: item.isActive
+            type: "TOGGLE_TODO", id: item.id, isActive: item.isActive
         })
     }
 
     const changeTodoText = (event, id) => {
         dispatch({
-            type: "CHANGE_TEXT_TODO",
-            id: id,
-            title: event.target.value
+            type: "CHANGE_TEXT_TODO", id: id, title: event.target.value
+        })
+    }
+
+    const deleteTodo = (id) => {
+        dispatch({
+            type: "DELETE_TODO", id: id
+        })
+    }
+
+    function deleteCompleted() {
+        list.filter(x => !x.isActive).forEach((element) => {
+            deleteTodo(element.id)
         })
     }
 
@@ -52,23 +53,27 @@ function TodoList({list, dispatch}) {
 
     function getClickedInput(id) {
         setClickedId(id)
-
-
     }
 
     function generateElements(item) {
         return <div className={style.itemRow} key={item.id}>
-            <input onChange={() => completeTodo(item)}
-                   type={"checkbox"}
-                   defaultChecked={item.isActive}/>
-            <div onDoubleClick={() => getClickedInput(item.id)}>
+            <div className={style.checkBox}>
+                <input onChange={() => completeTodo(item)}
+                       type={"checkbox"}
+                       defaultChecked={!item.isActive}/>
+            </div>
+            <div onDoubleClick={() => getClickedInput(item.id)}
+                 className={style.todoInputContainer}>
                 <input disabled={clickedId !== item.id}
                        value={item.title}
-                       ref={todoInput}
+                       className={style.todoInput}
+                       autoFocus={clickedId === item.id}
                        onChange={(event) => changeTodoText(event, item.id)}/>
+            </div>
+            <div className={style.status + ' ' + (item.isActive ? style.backAqua : style.backGreen)}>
                 {(item.isActive ? 'active' : 'completed')}
             </div>
-
+            <div onClick={() => deleteTodo(item.id)}>delete</div>
         </div>
     }
 
@@ -81,8 +86,18 @@ function TodoList({list, dispatch}) {
         }) : ''
     }
 
+    function lengthOfActiveTodo() {
+        setListLength(list.filter(x => x.isActive).length)
+    }
+
+    useEffect(() => {
+        if (list && list.length > 0) {
+            lengthOfActiveTodo()
+        }
+    }, [])
+
     return (<div className={style.todoListContainer}>
-        <div>
+        <div className={style.addTodo}>
             <input onKeyPress={(event) => saveTodo(event)}
                    onChange={e => setTextInput(e.target.value)}
                    value={textInput}
@@ -92,13 +107,17 @@ function TodoList({list, dispatch}) {
         <div className="listContainer">
             {todoItems}
         </div>
-        <div>
-            <div></div>
+        <div className={style.filterContainer}>
+            <div>
+                <span>{listLength}</span><span>item left</span>
+            </div>
             <div>
                 <button onClick={() => addFilter('active')}>active</button>
                 <button onClick={() => addFilter('all')}>All</button>
             </div>
-            <div></div>
+            <div>
+                <button onClick={deleteCompleted}>deleteCompleted</button>
+            </div>
         </div>
     </div>)
 }
