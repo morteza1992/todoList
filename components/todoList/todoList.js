@@ -1,6 +1,7 @@
 import style from './style/todoList.module.scss'
 import {useState, useEffect} from 'react'
 import {connect} from "react-redux";
+import {useRouter} from "next/router";
 
 function mapStateToProps(store) {
     return {
@@ -9,6 +10,7 @@ function mapStateToProps(store) {
 }
 
 function TodoList({list, dispatch}) {
+    const router = useRouter()
     const [filter, setFilter] = useState('all');
     const [clickedId, setClickedId] = useState(null);
     const [textInput, setTextInput] = useState('');
@@ -49,6 +51,7 @@ function TodoList({list, dispatch}) {
 
     function addFilter(filter) {
         setFilter(filter)
+        router.replace(`?${filter}`)
     }
 
     function getClickedInput(id) {
@@ -97,6 +100,7 @@ function TodoList({list, dispatch}) {
         if (list && list.length > 0) {
             lengthOfActiveTodo()
         }
+        router.replace('?all')
     }, [])
 
     return (<div className={style.todoListContainer}>
@@ -118,7 +122,8 @@ function TodoList({list, dispatch}) {
             <div className={style.filters}>
                 <span className={filter === 'active' ? style.active : ''}
                       onClick={() => addFilter('active')}>active</span>
-                <span className={filter === 'all' ? style.active : ''} onClick={() => addFilter('all')}>All</span>
+                <span className={filter === 'all' ? style.active : ''}
+                      onClick={() => addFilter('all')}>All</span>
             </div>
             <div>
                 <button onClick={deleteCompleted}>Clear completed</button>
